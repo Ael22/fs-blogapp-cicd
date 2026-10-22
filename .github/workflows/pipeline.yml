@@ -11,9 +11,6 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
     steps: 
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
@@ -30,7 +27,7 @@ jobs:
         working-directory: frontend
       - name: lint backend
         run: npm run lint
-      - name: lint frontned
+      - name: lint frontend
         run: npm run lint
         working-directory: frontend
   
@@ -89,11 +86,12 @@ jobs:
         run: npm ci
       - name: Install frontend dependencies
         run: npm ci
+        working-directory: frontend
       - name: Install Playwright dependencies
         run: npm ci
         working-directory: frontend/e2e-tests
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium firedox
+        run: npx playwright install --with-deps chromium firefox
         working-directory: frontend/e2e-tests
       - name: Start backend
         run: npm run start:test &
@@ -102,8 +100,8 @@ jobs:
         working-directory: frontend
       - name: wait for servers
         run: |
-          for i in ${seq 1 30}; do
-            if curl -fs -o /dev/null http://localhost:3003/api/blogs && curl -fs /dev/null http://localhost:5173; then
+          for i in $(seq 1 30); do
+            if curl -fs -o /dev/null http://localhost:3003/api/blogs && curl -fs -o /dev/null http://localhost:5173; then
               exit 0
             fi
             sleep 2
